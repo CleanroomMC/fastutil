@@ -19,3 +19,6 @@ pom-*.xml
 
 # Ignore Gradle project-specific cache directory
 .gradle
+
+# Ignore IDEA settings
+.idea
