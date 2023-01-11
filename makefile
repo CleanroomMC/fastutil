@@ -3,7 +3,7 @@ include build.properties
 TAR=tar
 PKG_PATH = it/unimi/dsi/fastutil
 SOURCEDIR = src/main/java/$(PKG_PATH)
-GEN_SRCDIR ?= src
+GEN_SRCDIR ?= src/main/java
 export GEN_SRCDIR
 DOCSDIR = docs
 
