@@ -230,7 +230,7 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
          while(i.hasNext()) this.add(i.next{{ wrapperClassName }}());
 	}
 
-	/** Returns the backing array of this list.
+	/** Returns the snapshot of backing array of this list.
 
 	  *
 
@@ -244,5 +244,52 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
 	    } finally {
 	        rlock.unlock();
 	    }
+	}
+
+	/** Wraps a given array into an array list of given size.
+
+	  *
+
+	  * <p>Note it is guaranteed
+
+	  * that the type of the array returned by {@link #elements()} will be the same
+
+	  * (see the comments in the class documentation).
+
+	  *
+
+	  * @param a an array to wrap.
+
+	  * @param length the length of the resulting array list.
+
+	  * @return a new array list of the given size, wrapping the given array.
+
+	  */
+	public static {{ className }} wrap(final {{ primitiveTypeName }} a[], final int length) {
+	    if (length > a.length) throw new IllegalArgumentException("The specified length (" + length + ") is greater than the array size (" + a.length + ")");
+	    final {{ className }} l = new {{ className }}(a, true);
+	    l.size = length;
+	    return l;
+	}
+
+	/** Wraps a given array into an array list.
+
+	  *
+
+	  * <p>Note it is guaranteed
+
+	  * that the type of the array returned by {@link #elements()} will be the same
+
+	  * (see the comments in the class documentation).
+
+	  *
+
+	  * @param a an array to wrap.
+
+	  * @return a new array list wrapping the given array.
+
+	  */
+	public static {{ className }} wrap(final {{ primitiveTypeName }} a[]) {
+	    return wrap(a, a.length);
 	}
 }
