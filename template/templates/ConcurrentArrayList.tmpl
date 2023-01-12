@@ -1,18 +1,89 @@
 package {{ typePackagePath }};
 
-import {{ typePackagePath }}.BooleanArrays;
+import it.unimi.dsi.fastutil.{{ primitiveTypeName }}.{{ capitalizedPrimitiveTypeName }}Arrays;
 
-public class {{ className }} extends Abstract{{ typeName }}List implements RandomAccess, Cloneable, java.io.Serializable {
+public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}List implements RandomAccess, Cloneable, java.io.Serializable {
     public static final int DEFAULT_INITIAL_CAPACITY = 10;
-    protected transient boolean a[];
+    protected transient {{ primitiveTypeName }} a[];
     protected int size;
 
-    private static final boolean[] copyArraySafe(boolean[] a, int length) {
-    	if (length == 0) return BooleanArrays.EMPTY_ARRAY;
+    private static final {{ primitiveTypeName }}[] copyArraySafe({{ primitiveTypeName }}[] a, int length) {
+    	if (length == 0) return {{ capitalizedPrimitiveTypeName }}Arrays.EMPTY_ARRAY;
     	return java.util.Arrays.copyOf(a, length);
     }
 
-    private static final boolean[] copyArrayFromSafe({{ className }} l) {
+    private static final {{ primitiveTypeName }}[] copyArrayFromSafe({{ className }} l) {
     	return copyArraySafe(l.a, l.size);
     }
+
+    protected {{ className }}(final {{ primitiveTypeName }} a[], @SuppressWarnings("unused") boolean wrapped) {
+    	this.a = a;
+    }
+
+    private void initArrayFromCapacity(final int capacity) {
+    	if (capacity < 0) throw new IllegalArgumentException("Initial capacity (" + capacity + ") is negative");
+    	if (capacity == 0) a = {{ capitalizedPrimitiveTypeName }}Arrays.EMPTY_ARRAY;
+    	else a = new {{ primitiveTypeName }}[capacity];
+    }
+
+	public {{ className }}(final int capacity) {
+	    initArrayFromCapacity(capacity);
+	}
+
+	public {{ className }}() {
+	    a = {{ capitalizedPrimitiveTypeName }}Arrays.DEFAULT_EMPTY_ARRAY;
+	}
+
+	public {{ className }}(final Collection<? extends {{ wrapperClassName }}> c) {
+        if (c instanceof {{ capitalizedPrimitiveTypeName }}ArrayList) {
+            a = copyArrayFromSafe(({{ capitalizedPrimitiveTypeName }}ArrayList) c);
+            size = a.length;
+	    } else {
+            initArrayFromCapacity(c.size());
+            if (c instanceof {{ capitalizedPrimitiveTypeName }}List) {
+                (({{ capitalizedPrimitiveTypeName }}List) c).getElements(0, a, 0, size = c.size());
+            } else {
+                size = {{ capitalizedPrimitiveTypeName }}Iterators.unwrap({{ capitalizedPrimitiveTypeName }}Iterators.as{{ capitalizedPrimitiveTypeName }}Iterator(c.iterator()), a);
+            }
+	    }
+	}
+
+	public {{ className }}(final {{ capitalizedPrimitiveTypeName }}Collection c) {
+	    if (c instanceof {{ capitalizedPrimitiveTypeName }}ArrayList) {
+	        a = copyArrayFromSafe(({{ capitalizedPrimitiveTypeName }}ArrayList) c);
+	        size = a.length;
+	    } else {
+            initArrayFromCapacity(c.size());
+            if (c instanceof {{ capitalizedPrimitiveTypeName }}List) {
+                (({{ capitalizedPrimitiveTypeName }}List) c).getElements(0, a, 0, size = c.size());
+            } else {
+                size = {{ capitalizedPrimitiveTypeName }}Iterators.unwrap(c.iterator(), a);
+            }
+	    }
+	}
+
+	public {{ className }}(final {{ capitalizedPrimitiveTypeName }}List l) {
+	    if (l instanceof {{ capitalizedPrimitiveTypeName }}ArrayList) {
+	        a = copyArrayFromSafe(({{ capitalizedPrimitiveTypeName }}ArrayList) l);
+	        size = a.length;
+	    } else {
+	        initArrayFromCapacity(l.size());
+	        l.getElements(0, a, 0, size = l.size());
+	    }
+	}
+
+	public {{ className }}(final {{ primitiveTypeName }} a[]) {
+	    this(a, 0, a.length);
+	}
+
+	public {{ className }}(final {{ primitiveTypeName }} a[], final int offset, final int length) {
+         this(length);
+         System.arraycopy(a, offset, this.a, 0, length);
+         size = length;
+	}
+
+	public {{ className }}(final Iterator<? extends {{ wrapperClassName }}> i) {
+         this();
+         while(i.hasNext()) this.add((i.next()).{{ primitiveTypeName }}Value());
+	}
 }
