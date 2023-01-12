@@ -29,8 +29,8 @@ export function genTypedTemplate(type: TemplatingTypes, classNameTemplating: Typ
     let typedTemplate = commonTemplate;
 
     typedTemplate['typePackagePath'] = `${typedTemplate['packagePath']}.${type}`;
-    typedTemplate['typeName'] = type;
-    typedTemplate['capitalizedTypeName'] = capitalize(type);
+    typedTemplate['primitiveTypeName'] = type;
+    typedTemplate['capitalizedPrimitiveTypeName'] = capitalize(type);
     typedTemplate['className'] = classNameTemplating(typedTemplate);
     typedTemplate['wrapperClassName'] = wrapperTypes[type];
 

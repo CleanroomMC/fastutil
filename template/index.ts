@@ -12,7 +12,7 @@ type SourceTemplatingSet = {
 
 
 const files: SourceTemplatingSet = {
-    "ConcurrentArrayList.tmpl": (tmpl: TemplatingProps) => `Concurrent${tmpl['capitalizedTypeName']}ArrayList`
+    "ConcurrentArrayList.tmpl": (tmpl: TemplatingProps) => `Concurrent${tmpl['capitalizedPrimitiveTypeName']}ArrayList`
 };
 
 (async () => {
