@@ -2,11 +2,71 @@ package {{ typePackagePath }};
 
 import it.unimi.dsi.fastutil.{{ primitiveTypeName }}.{{ capitalizedPrimitiveTypeName }}Arrays;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.RandomAccess;
+import java.util.NoSuchElementException;
 
+/** A type-specific concurrent array-based list; provides some additional methods that use polymorphism to avoid (un)boxing.
+
+  *
+
+  * <p>This class implements a lightweight, fast, open, optimized,
+
+  * reuse-oriented version of array-based lists. Instances of this class
+
+  * represent a list with an array that is enlarged as needed when new entries
+
+  * are created (by increasing its current length by 50%), but is
+
+  * <em>never</em> made smaller (even on a {@link #clear()}). A family of
+
+  * {@linkplain #trim() trimming methods} lets you control the size of the
+
+  * backing array; this is particularly useful if you reuse instances of this class.
+
+  * Range checks are equivalent to those of {@code java.util}'s classes, but
+
+  * they are delayed as much as possible. The backing array is exposed by the
+
+  * {@link #elements()} method.
+
+  *
+
+  * <p>This class implements the bulk methods {@code removeElements()},
+
+  * {@code addElements()} and {@code getElements()} using
+
+  * high-performance system calls (e.g., {@link
+
+  * System#arraycopy(Object,int,Object,int,int) System.arraycopy()}) instead of
+
+  * expensive loops.
+
+  *
+
+  * @see java.util.ArrayList
+
+  */
 public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}List implements RandomAccess, Cloneable, Serializable {
+    /** The initial default capacity of an array list. */
     public static final int DEFAULT_INITIAL_CAPACITY = 10;
+    /** The backing array. */
     protected transient {{ primitiveTypeName }} a[];
+    /** The current actual size of the list (never greater than the backing-array length). */
     protected int size;
+    /** Ensures that the component type of the given array is the proper type.
+
+      * This is irrelevant for primitive types, so it will just do a trivial copy.
+
+      * But for Reference types, you can have a {@code String[]} masquerading as an {@code Object[]},
+
+      * which is a case we need to prepare for because we let the user give an array to use directly
+
+      * with {@link #wrap}.
+
+      */
 
     private static final {{ primitiveTypeName }}[] copyArraySafe({{ primitiveTypeName }}[] a, int length) {
     	if (length == 0) return {{ capitalizedPrimitiveTypeName }}Arrays.EMPTY_ARRAY;
@@ -17,6 +77,17 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
     	return copyArraySafe(l.a, l.size);
     }
 
+    /** Creates a new array list using a given array.
+
+      *
+
+      * <p>This constructor is only meant to be used by the wrapping methods.
+
+      *
+
+      * @param a the array that will be used to back this array list.
+
+      */
     protected {{ className }}(final {{ primitiveTypeName }} a[], @SuppressWarnings("unused") boolean wrapped) {
     	this.a = a;
     }
@@ -27,14 +98,29 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
     	else a = new {{ primitiveTypeName }}[capacity];
     }
 
+    /** Creates a new array list with given capacity.
+
+      *
+
+      * @param capacity the initial capacity of the array list (may be 0).
+
+      */
 	public {{ className }}(final int capacity) {
 	    initArrayFromCapacity(capacity);
 	}
 
+    /** Creates a new array list with {@link #DEFAULT_INITIAL_CAPACITY} capacity. */
 	public {{ className }}() {
-	    a = {{ capitalizedPrimitiveTypeName }}Arrays.DEFAULT_EMPTY_ARRAY;
+	    a = {{ capitalizedPrimitiveTypeName }}Arrays.DEFAULT_EMPTY_ARRAY; // We delay allocation
 	}
 
+    /** Creates a new array list and fills it with a given collection.
+
+      *
+
+      * @param c a collection that will be used to fill the array list.
+
+      */
 	public {{ className }}(final Collection<? extends {{ wrapperClassName }}> c) {
         if (c instanceof {{ capitalizedPrimitiveTypeName }}ArrayList) {
             a = copyArrayFromSafe(({{ capitalizedPrimitiveTypeName }}ArrayList) c);
@@ -49,6 +135,13 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
 	    }
 	}
 
+    /** Creates a new array list and fills it with a given type-specific collection.
+
+      *
+
+      * @param c a type-specific collection that will be used to fill the array list.
+
+      */
 	public {{ className }}(final {{ capitalizedPrimitiveTypeName }}Collection c) {
 	    if (c instanceof {{ capitalizedPrimitiveTypeName }}ArrayList) {
 	        a = copyArrayFromSafe(({{ capitalizedPrimitiveTypeName }}ArrayList) c);
@@ -63,6 +156,13 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
 	    }
 	}
 
+    /** Creates a new array list and fills it with a given type-specific list.
+
+      *
+
+      * @param l a type-specific list that will be used to fill the array list.
+
+      */
 	public {{ className }}(final {{ capitalizedPrimitiveTypeName }}List l) {
 	    if (l instanceof {{ capitalizedPrimitiveTypeName }}ArrayList) {
 	        a = copyArrayFromSafe(({{ capitalizedPrimitiveTypeName }}ArrayList) l);
@@ -73,21 +173,53 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
 	    }
 	}
 
+    /** Creates a new array list and fills it with the elements of a given array.
+
+      *
+
+      * @param a an array whose elements will be used to fill the array list.
+
+      */
 	public {{ className }}(final {{ primitiveTypeName }} a[]) {
 	    this(a, 0, a.length);
 	}
 
+    /** Creates a new array list and fills it with the elements of a given array.
+
+      *
+
+      * @param a an array whose elements will be used to fill the array list.
+
+      * @param offset the first element to use.
+
+      * @param length the number of elements to use.
+
+      */
 	public {{ className }}(final {{ primitiveTypeName }} a[], final int offset, final int length) {
          this(length);
          System.arraycopy(a, offset, this.a, 0, length);
          size = length;
 	}
 
+    /** Creates a new array list and fills it with the elements returned by an iterator..
+
+      *
+
+      * @param i an iterator whose returned elements will fill the array list.
+
+      */
 	public {{ className }}(final Iterator<? extends {{ wrapperClassName }}> i) {
          this();
          while(i.hasNext()) this.add((i.next()).{{ primitiveTypeName }}Value());
 	}
 
+    /** Creates a new array list and fills it with the elements returned by a type-specific iterator..
+
+      *
+
+      * @param i a type-specific iterator whose returned elements will fill the array list.
+
+      */
 	public {{ className }}(final {{ capitalizedPrimitiveTypeName }}Iterator i) {
          this();
          while(i.hasNext()) this.add(i.next{{ wrapperClassName }}());
