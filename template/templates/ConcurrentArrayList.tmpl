@@ -86,4 +86,9 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
          this();
          while(i.hasNext()) this.add((i.next()).{{ primitiveTypeName }}Value());
 	}
+
+	public {{ className }}(final {{ capitalizedPrimitiveTypeName }}Iterator i) {
+         this();
+         while(i.hasNext()) this.add(i.next{{ wrapperClassName }}());
+	}
 }
