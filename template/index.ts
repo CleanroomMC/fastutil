@@ -9,12 +9,10 @@ type SourceTemplatingSet = {
     [key: string]: (tmpl: TemplatingProps) => string
 };
 
-function capitalize(literal: string): string {
-    return literal[0].toUpperCase() + literal.slice(1);
-}
+
 
 const files: SourceTemplatingSet = {
-    "ConcurrentArrayList.tmpl": (tmpl: TemplatingProps) => `Concurrent${capitalize(tmpl['typeName'])}ArrayList`
+    "ConcurrentArrayList.tmpl": (tmpl: TemplatingProps) => `Concurrent${tmpl['capitalizedTypeName']}ArrayList`
 };
 
 (async () => {
