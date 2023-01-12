@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.RandomAccess;
 import java.util.NoSuchElementException;
+import java.util.concurrent.locks.*;
 
 /** A type-specific concurrent array-based list; provides some additional methods that use polymorphism to avoid (un)boxing.
 
@@ -50,6 +51,10 @@ import java.util.NoSuchElementException;
 
   */
 public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}List implements RandomAccess, Cloneable, Serializable {
+    /** The locks. */
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final WriteLock wlock = lock.writeLock();
+    private final ReadLock rlock = lock.readLock();
     /** The initial default capacity of an array list. */
     public static final int DEFAULT_INITIAL_CAPACITY = 10;
     /** The backing array. */
