@@ -7,5 +7,11 @@
     "gen": "tsc && node dist/index.js"
   },
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "template-file": "^6.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18"
+  }
 }
