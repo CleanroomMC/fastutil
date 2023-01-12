@@ -237,7 +237,7 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
 	  * @return the backing array.
 
 	  */
-	public boolean[] elements() {
+	public {{ primitiveTypeName }}[] elements() {
 	    rlock.lock();
 	    try {
             return Arrays.copyOf(a, size);
