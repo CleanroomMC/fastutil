@@ -1,8 +1,9 @@
 package {{ typePackagePath }};
 
 import it.unimi.dsi.fastutil.{{ primitiveTypeName }}.{{ capitalizedPrimitiveTypeName }}Arrays;
+import java.io.Serializable;
 
-public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}List implements RandomAccess, Cloneable, java.io.Serializable {
+public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}List implements RandomAccess, Cloneable, Serializable {
     public static final int DEFAULT_INITIAL_CAPACITY = 10;
     protected transient {{ primitiveTypeName }} a[];
     protected int size;
