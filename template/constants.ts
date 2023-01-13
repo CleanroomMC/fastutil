@@ -11,6 +11,16 @@ export const wrapperTypes: {[key in TemplatingTypes]: string} = {
     'double': 'Double'
 };
 
+export const defaultValues: {[key in TemplatingTypes]: string} = {
+    'boolean': 'false',
+    'byte': '0',
+    'short': '0',
+    'int': '0',
+    'long': '0L',
+    'float': '0F',
+    'double': '0D'
+};
+
 export type TemplatingProps = {
     [key: string]: string
 };
@@ -33,6 +43,7 @@ export function genTypedTemplate(type: TemplatingTypes, classNameTemplating: Typ
     typedTemplate['capitalizedPrimitiveTypeName'] = capitalize(type);
     typedTemplate['className'] = classNameTemplating(typedTemplate);
     typedTemplate['wrapperClassName'] = wrapperTypes[type];
+    typedTemplate['defaultValue'] = defaultValues[type];
 
     return typedTemplate;
 }
