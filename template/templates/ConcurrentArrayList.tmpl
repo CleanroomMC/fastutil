@@ -1,6 +1,6 @@
 package {{ typePackagePath }};
 
-import it.unimi.dsi.fastutil.{{ primitiveTypeName }}.{{ capitalizedPrimitiveTypeName }}Arrays;
+import it.unimi.dsi.fastutil.{{ primitiveTypeName }}.*;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
@@ -317,5 +317,253 @@ public class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}L
 	  */
 	public static {{ className }} of(final {{ primitiveTypeName }}... init) {
 	    return wrap(init);
+	}
+
+	/** Ensures that this array list can contain the given number of entries without resizing.
+
+	  *
+
+	  * @param capacity the new minimum capacity for this array list.
+
+	  */
+	public void ensureCapacity(final int capacity) {
+	    wlock.lock();
+	    try {
+	        if (capacity <= a.length || (a == {{ capitalizedPrimitiveTypeName }}Arrays.DEFAULT_EMPTY_ARRAY && capacity <= DEFAULT_INITIAL_CAPACITY)) return;
+	        a = {{ capitalizedPrimitiveTypeName }}Arrays.ensureCapacity(a, capacity, size);
+        } finally {
+            assert size <= a.length;
+            wlock.unlock();
+	    }
+	}
+
+	/** Grows this array list, ensuring that it can contain the given number of entries without resizing,
+
+	  * and in case increasing the current capacity at least by a factor of 50%.
+
+	  *
+
+	  * This method assumes the list is being locked by write lock.
+
+	  * @param capacity the new minimum capacity for this array list.
+
+	  */
+	private void grow(int capacity) {
+	    if (capacity <= a.length) return;
+        if (a != {{ capitalizedPrimitiveTypeName }}Arrays.DEFAULT_EMPTY_ARRAY)
+            capacity = (int)Math.max(Math.min((long)a.length + (a.length >> 1), it.unimi.dsi.fastutil.Arrays.MAX_ARRAY_SIZE), capacity);
+        else if (capacity < DEFAULT_INITIAL_CAPACITY) capacity = DEFAULT_INITIAL_CAPACITY;
+        a = {{ capitalizedPrimitiveTypeName }}Arrays.forceCapacity(a, capacity, size);
+        assert size <= a.length;
+	}
+
+	@Override
+	public void add(final int index, final {{ primitiveTypeName }} k) {
+	    wlock.lock();
+	    try {
+            ensureIndex(index);
+            grow(size + 1);
+            if (index != size) System.arraycopy(a, index, a, index + 1, size - index);
+            a[index] = k;
+            size++;
+	    } finally {
+	        assert size <= a.length;
+	        wlock.unlock();
+	    }
+	}
+
+	@Override
+	public boolean add(final {{ primitiveTypeName }} k) {
+	    wlock.lock();
+	    try {
+	        grow(size + 1);
+	        a[size++] = k;
+	        return true;
+	    } finally {
+	        assert size <= a.length;
+	        wlock.unlock();
+	    }
+	}
+
+	@Override
+	public {{ primitiveTypeName }} get{{ capitalizedPrimitiveTypeName }}(final int index) {
+	    rlock.lock();
+	    try {
+            if (index >= size) throw new IndexOutOfBoundsException("Index (" + index + ") is greater than or equal to list size (" + size + ")");
+            return a[index];
+        } finally {
+            rlock.unlock();
+        }
+	}
+
+	@Override
+	public int indexOf(final {{ primitiveTypeName }} k) {
+	    rlock.lock();
+        try {
+	        for(int i = 0; i < size; i++) if (( (k) == (a[i]) )) return i;
+            return -1;
+	    } finally {
+	        rlock.unlock();
+	    }
+	}
+
+	@Override
+	public int lastIndexOf(final {{ primitiveTypeName }} k) {
+	    rlock.lock();
+        try {
+	        for(int i = size; i-- != 0;) if (( (k) == (a[i]) )) return i;
+	        return -1;
+        } finally {
+            rlock.unlock();
+        }
+	}
+
+	private {{ primitiveTypeName }} remove(final int index) {
+	    if (index >= size) throw new IndexOutOfBoundsException("Index (" + index + ") is greater than or equal to list size (" + size + ")");
+        final {{ primitiveTypeName }} old = a[index];
+        size--;
+        if (index != size) System.arraycopy(a, index + 1, a, index, size - index);
+        assert size <= a.length;
+        return old;
+	}
+
+	@Override
+	public {{ primitiveTypeName }} remove{{ capitalizedPrimitiveTypeName }}(final int index) {
+	    wlock.lock();
+	    try {
+	        return remove(index);
+	    } finally {
+	        wlock.unlock();
+	    }
+	}
+
+	@Override
+	public boolean rem(final {{ primitiveTypeName }} k) {
+        wlock.lock();
+        try {
+            int index = indexOf(k);
+            if (index == -1) return false;
+            remove(index);
+            return true;
+	    } finally {
+	        assert size <= a.length;
+	        wlock.unlock();
+	    }
+	}
+
+	@Override
+	public {{ primitiveTypeName }} set(final int index, final {{ primitiveTypeName }} k) {
+        wlock.lock();
+        try {
+            if (index >= size) throw new IndexOutOfBoundsException("Index (" + index + ") is greater than or equal to list size (" + size + ")");
+            {{ primitiveTypeName }} old = a[index];
+            a[index] = k;
+            return old;
+	    } finally {
+	        wlock.unlock();
+	    }
+	}
+
+	@Override
+	public void clear() {
+	    wlock.lock();
+	    try {
+	        size = 0;
+	    } finally {
+	        assert size <= a.length;
+	        wlock.unlock();
+	    }
+	}
+
+	@Override
+	public int size() {
+	    rlock.lock();
+	    try {
+	        return size;
+        } finally {
+            rlock.unlock();
+        }
+	}
+
+	@Override
+	public void size(final int size) {
+	    wlock.lock();
+	    try {
+	        if (size > a.length) a = {{ capitalizedPrimitiveTypeName }}Arrays.forceCapacity(a, size, this.size);
+            if (size > this.size) Arrays.fill(a, this.size, size, (false));
+            this.size = size;
+	    } finally {
+            wlock.unlock();
+	    }
+	}
+
+	@Override
+	public boolean isEmpty() {
+	    rlock.lock();
+	    try {
+	        return size == 0;
+	    } finally {
+	        rlock.unlock();
+	    }
+	}
+
+	private void trimArray(final int n) {
+	    if (n >= a.length || size == a.length) return;
+        final {{ primitiveTypeName }} t[] = new {{ primitiveTypeName }}[Math.max(n, size)];
+        System.arraycopy(a, 0, t, 0, size);
+        a = t;
+        assert size <= a.length;
+	}
+
+	/** Trims this array list so that the capacity is equal to the size.
+
+	  *
+
+	  * @see java.util.ArrayList#trimToSize()
+
+	  */
+	public void trim() {
+	    wlock.lock();
+	    try {
+	        trimArray(0);
+	    } finally {
+	        wlock.unlock();
+	    }
+	}
+
+	/** Trims the backing array if it is too large.
+
+	  *
+
+	  * If the current array length is smaller than or equal to
+
+	  * {@code n}, this method does nothing. Otherwise, it trims the
+
+	  * array length to the maximum between {@code n} and {@link #size()}.
+
+	  *
+
+	  * <p>This method is useful when reusing lists.  {@linkplain #clear() Clearing a
+
+	  * list} leaves the array length untouched. If you are reusing a list
+
+	  * many times, you can call this method with a typical
+
+	  * size to avoid keeping around a very large array just
+
+	  * because of a few large transient lists.
+
+	  *
+
+	  * @param n the threshold for the trimming.
+
+	  */
+	public void trim(final int n) {
+	    wlock.lock();
+	    try {
+	        trimArray(n);
+	    } finally {
+	        wlock.unlock();
+	    }
 	}
 }
