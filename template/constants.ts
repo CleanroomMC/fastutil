@@ -1,8 +1,9 @@
-export const templatingTypes = ['boolean', 'byte', 'short', 'int', 'long', 'float', 'double'] as const;
+export const templatingTypes = ['boolean', 'char', 'byte', 'short', 'int', 'long', 'float', 'double'] as const;
 export type TemplatingTypes = typeof templatingTypes[number];
 
 export const wrapperTypes: {[key in TemplatingTypes]: string} = {
     'boolean': 'Boolean',
+    'char': 'Character',
     'byte': 'Byte',
     'short': 'Short',
     'int': 'Integer',
@@ -13,6 +14,7 @@ export const wrapperTypes: {[key in TemplatingTypes]: string} = {
 
 export const defaultValues: {[key in TemplatingTypes]: string} = {
     'boolean': 'false',
+    'char': '\\u0000',
     'byte': '0',
     'short': '0',
     'int': '0',
