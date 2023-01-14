@@ -14,9 +14,9 @@ export const wrapperTypes: {[key in TemplatingTypes]: string} = {
 
 export const defaultValues: {[key in TemplatingTypes]: string} = {
     'boolean': 'false',
-    'char': '\\u0000',
-    'byte': '0',
-    'short': '0',
+    'char': '\'\\u0000\'',
+    'byte': '(byte)0',
+    'short': '(short)0',
     'int': '0',
     'long': '0L',
     'float': '0F',
