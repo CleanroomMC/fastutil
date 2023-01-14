@@ -1,6 +1,6 @@
-package {{ typePackagePath }}
+package {{ typePackagePath }}s;
 
-import it.unimi.dsi.fastutil.{{ primitiveTypeName }}.*;
+import it.unimi.dsi.fastutil.{{ primitiveTypeName }}s.*;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Iterator;
