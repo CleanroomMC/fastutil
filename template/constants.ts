@@ -23,24 +23,23 @@ export const defaultValues: {[key in TemplatingTypes]: string} = {
     'double': '0D'
 };
 
+export const packagePath = 'com.cleanroommc.fastutil'
+
 export type TemplatingProps = {
     [key: string]: string
 };
 
 export type TypeTemplating = (props: TemplatingProps) => string;
 
-export const commonTemplate: TemplatingProps = {
-    packagePath: 'com.cleanroommc.fastutil'
-};
-
 function capitalize(literal: string): string {
     return literal[0].toUpperCase() + literal.slice(1);
 }
 
 export function genTypedTemplate(type: TemplatingTypes, classNameTemplating: TypeTemplating): TemplatingProps {
-    let typedTemplate = commonTemplate;
+    let typedTemplate: TemplatingProps = {};
 
-    typedTemplate['typePackagePath'] = `${typedTemplate['packagePath']}.${type}`;
+    typedTemplate['typePackagePath'] = `${packagePath}.${type}`;
+    typedTemplate['typePackageDirPath'] = typedTemplate['typePackagePath'].replaceAll('.', '/');
     typedTemplate['primitiveTypeName'] = type;
     typedTemplate['capitalizedPrimitiveTypeName'] = capitalize(type);
     typedTemplate['className'] = classNameTemplating(typedTemplate);
