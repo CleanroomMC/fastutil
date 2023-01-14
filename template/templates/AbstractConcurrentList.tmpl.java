@@ -2,6 +2,8 @@ package {{ typePackagePath }}s;
 
 import it.unimi.dsi.fastutil.{{ primitiveTypeName }}s.*;
 import java.io.Serializable;
+import java.util.concurrent.locks.*;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Iterator;
 import java.util.ListIterator;
@@ -31,8 +33,8 @@ import java.util.RandomAccess;
 public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}Collection implements {{ capitalizedPrimitiveTypeName }}List, {{ capitalizedPrimitiveTypeName }}Stack {
     /** The locks. */
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final WriteLock wlock = lock.writeLock();
-    private final ReadLock rlock = lock.readLock();
+    private final Lock wlock = lock.writeLock();
+    private final Lock rlock = lock.readLock();
 
     protected {{ className }}() {
     }
@@ -277,7 +279,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
             ensureIndex(to);
             if (from > to)
                 throw new IndexOutOfBoundsException("Start index (" + from + ") is greater than end index (" + to + ")");
-            return this instanceof java.util.RandomAccess ? new {{ capitalizedPrimitiveTypeName }}RandomAccessSubList(this, from, to) : new {{ capitalizedPrimitiveTypeName }}SubList(this, from, to);
+            return this instanceof java.util.RandomAccess ? new Concurrent{{ capitalizedPrimitiveTypeName }}RandomAccessSubList(this, from, to) : new Concurrent{{ capitalizedPrimitiveTypeName }}SubList(this, from, to);
         } finally {
             rlock.unlock();
         }
@@ -612,7 +614,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
         try {
             final int size = size();
             if (a.length < size) {
-            a = Arrays.copyOf(a, size);
+                a = Arrays.copyOf(a, size);
             }
             getElements(0, a, 0, size);
             return a;
@@ -676,7 +678,11 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
     /**
      * A class implementing a sublist view.
      */
-    public static class {{ capitalizedPrimitiveTypeName }}SubList extends AbstractConcurrent{{ capitalizedPrimitiveTypeName }}List implements Serializable {
+    public static class Concurrent{{ capitalizedPrimitiveTypeName }}SubList extends AbstractConcurrent{{ capitalizedPrimitiveTypeName }}List implements Serializable {
+        /** The locks. */
+        private final ReadWriteLock lock = new ReentrantReadWriteLock();
+        private final Lock wlock = lock.writeLock();
+        private final Lock rlock = lock.readLock();
         /**
          * The list this sublist restricts.
          */
@@ -690,7 +696,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
          */
         protected int to;
 
-        public {{ capitalizedPrimitiveTypeName }}SubList(final {{ capitalizedPrimitiveTypeName }}List l, final int from, final int to) {
+        public Concurrent{{ capitalizedPrimitiveTypeName }}SubList(final {{ capitalizedPrimitiveTypeName }}List l, final int from, final int to) {
             this.l = l;
             this.from = from;
             this.to = to;
@@ -735,7 +741,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
         }
 
         @Override
-        public boolean addAll(final int index, final Collection<? extends {{ wrapperClassTypeName }}> c) {
+        public boolean addAll(final int index, final Collection<? extends {{ wrapperClassName }}> c) {
             wlock.lock();
             try {
                 ensureIndex(index);
@@ -796,7 +802,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
             try {
                 ensureIndex(from);
                 if (from + length > size())
-                throw new IndexOutOfBoundsException("End index (" + from + length + ") is greater than list size (" + size() + ")");
+                    throw new IndexOutOfBoundsException("End index (" + from + length + ") is greater than list size (" + size() + ")");
                 l.getElements(this.from + from, a, offset, length);
             } finally {
                 rlock.unlock();
@@ -996,11 +1002,11 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
                 throw new IllegalArgumentException("Start index (" + from + ") is greater than end index (" + to + ")");
             // Sadly we have to rewrap this, because if there is a sublist of a sublist, and the
             // subsublist adds, both sublists need to update their "to" value.
-            return new {{ capitalizedPrimitiveTypeName }}SubList(this, from, to);
+            return new Concurrent{{ capitalizedPrimitiveTypeName }}SubList(this, from, to);
         }
 
         @Override
-        public boolean rem(final {{ primitveTypeName }} k) {
+        public boolean rem(final {{ primitiveTypeName }} k) {
             int index = indexOf(k);
             if (index == -1) return false;
             to--;
@@ -1022,10 +1028,8 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
         }
     }
 
-    public static class {{ capitalizedPrimitiveTypeName }}RandomAccessSubList extends Concurrent{{ capitalizedPrimitiveTypeName }}SubList implements RandomAccess {
-        private static final long serialVersionUID = -107070782945191929L;
-
-        public {{ capitalizedPrimitiveTypeName }}RandomAccessSubList(final {{ capitalizedPrimitiveTypeName }}List l, final int from, final int to) {
+    public static class Concurrent{{ capitalizedPrimitiveTypeName }}RandomAccessSubList extends Concurrent{{ capitalizedPrimitiveTypeName }}SubList implements RandomAccess {
+        public Concurrent{{ capitalizedPrimitiveTypeName }}RandomAccessSubList(final {{ capitalizedPrimitiveTypeName }}List l, final int from, final int to) {
             super(l, from, to);
         }
 
@@ -1037,7 +1041,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
                 throw new IllegalArgumentException("Start index (" + from + ") is greater than end index (" + to + ")");
             // Sadly we have to rewrap this, because if there is a sublist of a sublist, and the
             // subsublist adds, both sublists need to update their "to" value.
-            return new {{ capitalizedPrimitiveTypeName }}RandomAccessSubList(this, from, to);
+            return new Concurrent{{ capitalizedPrimitiveTypeName }}RandomAccessSubList(this, from, to);
         }
     }
 }
