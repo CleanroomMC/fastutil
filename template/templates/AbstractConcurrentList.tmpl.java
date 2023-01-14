@@ -92,7 +92,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
      * @implSpec This implementation always throws an {@link UnsupportedOperationException}.
      */
     @Override
-    public {{ primitiveTypeName }} removeBoolean(final int i) {
+    public {{ primitiveTypeName }} remove{{ capitalizedPrimitiveTypeName }}(final int i) {
         throw new UnsupportedOperationException();
     }
 
@@ -162,7 +162,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
         return new {{ capitalizedPrimitiveTypeName }}Iterators.AbstractIndexBasedListIterator(0, index) {
             @Override
             protected {{ primitiveTypeName }} get(int i) {
-                return {{ className }}.this.getBoolean(i);
+                return {{ className }}.this.get{{ capitalizedPrimitiveTypeName }}(i);
             }
 
             @Override
@@ -206,7 +206,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
         }
 
         @Override
-        protected boolean get(int i) {
+        protected {{ primitiveTypeName }} get(int i) {
             return l.get{{ capitalizedPrimitiveTypeName }}(i);
         }
 
@@ -348,7 +348,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
      * implementations will override this method with a more optimized version.
      */
     @Override
-    public void addElements(int index, final boolean[] a, int offset, int length) {
+    public void addElements(int index, final {{ primitiveTypeName }}[] a, int offset, int length) {
         wlock.lock();
         try {
             ensureIndex(index);
@@ -461,7 +461,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
             int h = 1, s = size();
             while (s-- != 0) {
                 {{ primitiveTypeName }} k = i.next{{ capitalizedPrimitiveTypeName }}();
-                h = 31 * h + ((k) ? 1231 : 1237);
+                h = 31 * h + {{ wrapperClassName }}.hashCode(k);
             }
             return h;
         } finally {
@@ -629,7 +629,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
         try {
             ensureIndex(index);
             final {{ capitalizedPrimitiveTypeName }}Iterator i = c.iterator();
-            final {{ primitiveTypeName }} retVal = i.hasNext();
+            final boolean retVal = i.hasNext();
             while (i.hasNext()) add(index++, i.next{{ capitalizedPrimitiveTypeName }}());
             return retVal;
         } finally {
@@ -660,7 +660,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
             final {{ capitalizedPrimitiveTypeName }}Iterator i = iterator();
             int n = size();
             {{ primitiveTypeName }} k;
-            {{ primitiveTypeName }} first = true;
+            boolean first = true;
             s.append("[");
             while (n-- != 0) {
                 if (first) first = false;
@@ -764,7 +764,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
         }
 
         @Override
-        public {{ primitiveTypeName }} removeBoolean(final int index) {
+        public {{ primitiveTypeName }} remove{{ capitalizedPrimitiveTypeName }}(final int index) {
             wlock.lock();
             try {
                 ensureRestrictedIndex(index);
@@ -931,7 +931,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
             @Override
             public {{ primitiveTypeName }} next{{ capitalizedPrimitiveTypeName }}() {
                 if (!hasNext()) throw new NoSuchElementException();
-                return parent.nextBoolean();
+                return parent.next{{ capitalizedPrimitiveTypeName }}();
             }
 
             @Override
@@ -1010,7 +1010,7 @@ public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTyp
             int index = indexOf(k);
             if (index == -1) return false;
             to--;
-            l.removeBoolean(from + index);
+            l.remove{{ capitalizedPrimitiveTypeName }}(from + index);
             assert assertRange();
             return true;
         }
