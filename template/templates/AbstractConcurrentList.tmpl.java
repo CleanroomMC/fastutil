@@ -32,9 +32,9 @@ import java.util.RandomAccess;
  */
 public abstract class {{ className }} extends Abstract{{ capitalizedPrimitiveTypeName }}Collection implements {{ capitalizedPrimitiveTypeName }}List, {{ capitalizedPrimitiveTypeName }}Stack {
     /** The locks. */
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
-    private final Lock wlock = lock.writeLock();
-    private final Lock rlock = lock.readLock();
+    protected final ReadWriteLock lock = new ReentrantReadWriteLock();
+    protected final Lock wlock = lock.writeLock();
+    protected final Lock rlock = lock.readLock();
 
     protected {{ className }}() {
     }
