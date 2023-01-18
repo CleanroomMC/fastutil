@@ -1,4 +1,4 @@
-package {{ typePackagePath }}s;
+package {{ typePackagePath }};
 
 import it.unimi.dsi.fastutil.{{ primitiveTypeName }}s.*;
 import java.io.Serializable;

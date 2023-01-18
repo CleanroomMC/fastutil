@@ -38,7 +38,7 @@ function capitalize(literal: string): string {
 export function genTypedTemplate(type: TemplatingTypes, classNameTemplating: TypeTemplating): TemplatingProps {
     let typedTemplate: TemplatingProps = {};
 
-    typedTemplate['typePackagePath'] = `${packagePath}.${type}`;
+    typedTemplate['typePackagePath'] = `${packagePath}.${type}s`;
     typedTemplate['typePackageDirPath'] = typedTemplate['typePackagePath'].replaceAll('.', '/');
     typedTemplate['primitiveTypeName'] = type;
     typedTemplate['capitalizedPrimitiveTypeName'] = capitalize(type);
