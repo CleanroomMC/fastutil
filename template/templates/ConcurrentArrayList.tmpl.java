@@ -162,9 +162,9 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      *
      * @param l a type-specific list that will be used to fill the array list.
      */
-    public {{ className }}(final BooleanList l) {
-        if (l instanceof BooleanArrayList) {
-            a = copyArrayFromSafe((BooleanArrayList) l);
+    public {{ className }}(final {{ capitalizedPrimitiveTypeName }}List l) {
+        if (l instanceof {{ capitalizedPrimitiveTypeName }}ArrayList) {
+            a = copyArrayFromSafe(({{ capitalizedPrimitiveTypeName }}ArrayList) l);
             size = a.length;
         } else {
             initArrayFromCapacity(l.size());
@@ -177,7 +177,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      *
      * @param a an array whose elements will be used to fill the array list.
      */
-    public {{ className }}(final boolean[] a) {
+    public {{ className }}(final {{ primitiveTypeName }}[] a) {
         this(a, 0, a.length);
     }
 
@@ -188,7 +188,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      * @param offset the first element to use.
      * @param length the number of elements to use.
      */
-    public {{ className }}(final boolean[] a, final int offset, final int length) {
+    public {{ className }}(final {{ primitiveTypeName }}[] a, final int offset, final int length) {
         this(length);
         System.arraycopy(a, offset, this.a, 0, length);
         size = length;
@@ -199,9 +199,9 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      *
      * @param i an iterator whose returned elements will fill the array list.
      */
-    public BooleanArrayList(final Iterator<? extends Boolean> i) {
+    public {{ className }}(final Iterator<? extends {{ wrapperClassName }}> i) {
         this();
-        while (i.hasNext()) this.add((i.next()).booleanValue());
+        while (i.hasNext()) this.add((i.next()).{{ primitiveTypeName }}Value());
     }
 
     /**
@@ -209,9 +209,9 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      *
      * @param i a type-specific iterator whose returned elements will fill the array list.
      */
-    public BooleanArrayList(final BooleanIterator i) {
+    public {{ className }}(final {{ capitalizedPrimitiveTypeName }}Iterator i) {
         this();
-        while (i.hasNext()) this.add(i.nextBoolean());
+        while (i.hasNext()) this.add(i.next{{ capitalizedPrimitiveTypeName }}());
     }
 
     /**
@@ -219,7 +219,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      *
      * @return the backing array.
      */
-    public boolean[] elements() {
+    public {{ primitiveTypeName }}[] elements() {
         return a;
     }
 
@@ -238,10 +238,10 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      * @param length the length of the resulting array list.
      * @return a new array list of the given size, wrapping the given array.
      */
-    public static BooleanArrayList wrap(final boolean[] a, final int length) {
+    public static {{ className }} wrap(final {{ primitiveTypeName }}[] a, final int length) {
         if (length > a.length)
             throw new IllegalArgumentException("The specified length (" + length + ") is greater than the array size (" + a.length + ")");
-        final BooleanArrayList l = new BooleanArrayList(a, true);
+        final {{ className }} l = new {{ className }}(a, true);
         l.size = length;
         return l;
     }
@@ -260,7 +260,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      * @param a an array to wrap.
      * @return a new array list wrapping the given array.
      */
-    public static BooleanArrayList wrap(final boolean[] a) {
+    public static {{ className }} wrap(final {{ primitiveTypeName }}[] a) {
         return wrap(a, a.length);
     }
 
@@ -269,8 +269,8 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      *
      * @return a new empty array list.
      */
-    public static BooleanArrayList of() {
-        return new BooleanArrayList();
+    public static {{ className }} of() {
+        return new {{ className }}();
     }
 
     /**
@@ -281,7 +281,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      * @see #wrap
      */
 
-    public static BooleanArrayList of(final boolean... init) {
+    public static {{ className }} of(final {{ primitiveTypeName }}... init) {
         return wrap(init);
     }
 
