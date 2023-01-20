@@ -292,9 +292,9 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      */
 
     public void ensureCapacity(final int capacity) {
-        if (capacity <= a.length || (a == BooleanArrays.DEFAULT_EMPTY_ARRAY && capacity <= DEFAULT_INITIAL_CAPACITY))
+        if (capacity <= a.length || (a == {{ capitalizedPrimitiveTypeName }}Arrays.DEFAULT_EMPTY_ARRAY && capacity <= DEFAULT_INITIAL_CAPACITY))
             return;
-        a = BooleanArrays.ensureCapacity(a, capacity, size);
+        a = {{ capitalizedPrimitiveTypeName }}Arrays.ensureCapacity(a, capacity, size);
         assert size <= a.length;
     }
 
@@ -308,15 +308,15 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
 
     private void grow(int capacity) {
         if (capacity <= a.length) return;
-        if (a != BooleanArrays.DEFAULT_EMPTY_ARRAY)
+        if (a != {{ capitalizedPrimitiveTypeName }}Arrays.DEFAULT_EMPTY_ARRAY)
             capacity = (int) Math.max(Math.min((long) a.length + (a.length >> 1), it.unimi.dsi.fastutil.Arrays.MAX_ARRAY_SIZE), capacity);
         else if (capacity < DEFAULT_INITIAL_CAPACITY) capacity = DEFAULT_INITIAL_CAPACITY;
-        a = BooleanArrays.forceCapacity(a, capacity, size);
+        a = {{ capitalizedPrimitiveTypeName }}Arrays.forceCapacity(a, capacity, size);
         assert size <= a.length;
     }
 
     @Override
-    public void add(final int index, final boolean k) {
+    public void add(final int index, final {{ primitiveTypeName }} k) {
         ensureIndex(index);
         grow(size + 1);
         if (index != size) System.arraycopy(a, index, a, index + 1, size - index);
@@ -326,7 +326,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
     }
 
     @Override
-    public boolean add(final boolean k) {
+    public boolean add(final {{ primitiveTypeName }} k) {
         grow(size + 1);
         a[size++] = k;
         assert size <= a.length;
@@ -334,29 +334,29 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
     }
 
     @Override
-    public boolean getBoolean(final int index) {
+    public boolean get{{ capitalizedPrimitiveTypeName }}(final int index) {
         if (index >= size)
             throw new IndexOutOfBoundsException("Index (" + index + ") is greater than or equal to list size (" + size + ")");
         return a[index];
     }
 
     @Override
-    public int indexOf(final boolean k) {
+    public int indexOf(final {{ primitiveTypeName }} k) {
         for (int i = 0; i < size; i++) if (((k) == (a[i]))) return i;
         return -1;
     }
 
     @Override
-    public int lastIndexOf(final boolean k) {
+    public int lastIndexOf(final {{ primitiveTypeName }} k) {
         for (int i = size; i-- != 0; ) if (((k) == (a[i]))) return i;
         return -1;
     }
 
     @Override
-    public boolean removeBoolean(final int index) {
+    public {{ primitiveTypeName }} removeBoolean(final int index) {
         if (index >= size)
             throw new IndexOutOfBoundsException("Index (" + index + ") is greater than or equal to list size (" + size + ")");
-        final boolean old = a[index];
+        final {{ primitiveTypeName }} old = a[index];
         size--;
         if (index != size) System.arraycopy(a, index + 1, a, index, size - index);
         assert size <= a.length;
@@ -364,19 +364,19 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
     }
 
     @Override
-    public boolean rem(final boolean k) {
+    public boolean rem(final {{ primitiveTypeName }} k) {
         int index = indexOf(k);
         if (index == -1) return false;
-        removeBoolean(index);
+        remove{{ capitalizedPrimitiveTypeName }}(index);
         assert size <= a.length;
         return true;
     }
 
     @Override
-    public boolean set(final int index, final boolean k) {
+    public {{ primitiveTypeName }} set(final int index, final {{ primitiveTypeName }} k) {
         if (index >= size)
             throw new IndexOutOfBoundsException("Index (" + index + ") is greater than or equal to list size (" + size + ")");
-        boolean old = a[index];
+        {{ primitiveTypeName }} old = a[index];
         a[index] = k;
         return old;
     }
@@ -394,8 +394,8 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
 
     @Override
     public void size(final int size) {
-        if (size > a.length) a = BooleanArrays.forceCapacity(a, size, this.size);
-        if (size > this.size) Arrays.fill(a, this.size, size, (false));
+        if (size > a.length) a = {{ capitalizedPrimitiveTypeName }}Arrays.forceCapacity(a, size, this.size);
+        if (size > this.size) Arrays.fill(a, this.size, size, {{ defaultValue }});
         this.size = size;
     }
 
@@ -442,55 +442,53 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
     public void trim(final int n) {
         // TODO: use Arrays.trim() and preserve type only if necessary
         if (n >= a.length || size == a.length) return;
-        final boolean[] t = new boolean[Math.max(n, size)];
+        final {{ primitiveTypeName }}[] t = new {{ primitiveTypeName }}[Math.max(n, size)];
         System.arraycopy(a, 0, t, 0, size);
         a = t;
         assert size <= a.length;
     }
 
-    private class SubList extends AbstractBooleanList.BooleanRandomAccessSubList {
-        private static final long serialVersionUID = -3185226345314976296L;
-
+    private class SubList extends AbstractConcurrent{{ capitalizedPrimitiveTypeName }}List.BooleanRandomAccessSubList {
         protected SubList(int from, int to) {
-            super(BooleanArrayList.this, from, to);
+            super({{ className }}.this, from, to);
         }
 
         // Most of the inherited methods should be fine, but we can override a few of them for performance.
         // Needed because we can't access the parent class' instance variables directly in a different instance of SubList.
-        private boolean[] getParentArray() {
+        private {{ primitiveTypeName }}[] getParentArray() {
             return a;
         }
 
         @Override
-        public boolean getBoolean(int i) {
+        public {{ primitiveTypeName }} get{{ capitalizedPrimitiveTypeName }}(int i) {
             ensureRestrictedIndex(i);
             return a[i + from];
         }
 
-        private final class SubListIterator extends BooleanIterators.AbstractIndexBasedListIterator {
+        private final class SubListIterator extends {{ capitalizedPrimitiveTypeName }}Iterators.AbstractIndexBasedListIterator {
             // We are using pos == 0 to be 0 relative to SubList.from (meaning you need to do a[from + i] when accessing array).
             SubListIterator(int index) {
                 super(0, index);
             }
 
             @Override
-            protected boolean get(int i) {
+            protected {{ primitiveTypeName }} get(int i) {
                 return a[from + i];
             }
 
             @Override
-            protected void add(int i, boolean k) {
+            protected void add(int i, {{ primitiveTypeName }} k) {
                 SubList.this.add(i, k);
             }
 
             @Override
-            protected void set(int i, boolean k) {
+            protected void set(int i, {{ primitiveTypeName }} k) {
                 SubList.this.set(i, k);
             }
 
             @Override
             protected void remove(int i) {
-                SubList.this.removeBoolean(i);
+                SubList.this.remove{{ capitalizedPrimitiveTypeName }}(i);
             }
 
             @Override
@@ -499,19 +497,19 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
             }
 
             @Override
-            public boolean nextBoolean() {
+            public {{ primitiveTypeName }} next{{ capitalizedPrimitiveTypeName }}() {
                 if (!hasNext()) throw new NoSuchElementException();
                 return a[from + (lastReturned = pos++)];
             }
 
             @Override
-            public boolean previousBoolean() {
+            public {{ primitiveTypeName }} previous{{ capitalizedPrimitiveTypeName }}() {
                 if (!hasPrevious()) throw new NoSuchElementException();
                 return a[from + (lastReturned = --pos)];
             }
 
             @Override
-            public void forEachRemaining(final BooleanConsumer action) {
+            public void forEachRemaining(final {{ capitalizedPrimitiveTypeName }}Consumer action) {
                 final int max = to - from;
                 while (pos < max) {
                     action.accept(a[from + (lastReturned = pos++)]);
@@ -520,11 +518,11 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
         }
 
         @Override
-        public BooleanListIterator listIterator(int index) {
+        public {{ capitalizedPrimitiveTypeName }}ListIterator listIterator(int index) {
             return new SubListIterator(index);
         }
 
-        private final class SubListSpliterator extends BooleanSpliterators.LateBindingSizeIndexBasedSpliterator {
+        private final class SubListSpliterator extends {{ capitalizedPrimitiveTypeName }}Spliterators.LateBindingSizeIndexBasedSpliterator {
             // We are using pos == 0 to be 0 relative to real array 0
             SubListSpliterator() {
                 super(from);
@@ -540,7 +538,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
             }
 
             @Override
-            protected boolean get(int i) {
+            protected {{ primitiveTypeName }} get(int i) {
                 return a[i];
             }
 
@@ -550,14 +548,14 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
             }
 
             @Override
-            public boolean tryAdvance(final BooleanConsumer action) {
+            public boolean tryAdvance(final {{ capitalizedPrimitiveTypeName }}Consumer action) {
                 if (pos >= getMaxPos()) return false;
                 action.accept(a[pos++]);
                 return true;
             }
 
             @Override
-            public void forEachRemaining(final BooleanConsumer action) {
+            public void forEachRemaining(final {{ capitalizedPrimitiveTypeName }}Consumer action) {
                 final int max = getMaxPos();
                 while (pos < max) {
                     action.accept(a[pos++]);
@@ -566,7 +564,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
         }
 
         @Override
-        public BooleanSpliterator spliterator() {
+        public {{ capitalizedPrimitiveTypeName }}Spliterator spliterator() {
             return new SubListSpliterator();
         }
 
@@ -588,38 +586,34 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
             if (o == this) return true;
             if (o == null) return false;
             if (!(o instanceof java.util.List)) return false;
-            if (o instanceof BooleanArrayList other) {
-
+            if (o instanceof {{ capitalizedPrimitiveTypeName }}ArrayList other) {
                 return contentsEquals(other.a, 0, other.size());
             }
             if (o instanceof SubList other) {
-
                 return contentsEquals(other.getParentArray(), other.from, other.to);
             }
             return super.equals(o);
         }
 
-        int contentsCompareTo(boolean[] otherA, int otherAFrom, int otherATo) {
+        int contentsCompareTo({{ primitiveTypeName }}[] otherA, int otherAFrom, int otherATo) {
             if (a == otherA && from == otherAFrom && to == otherATo) return 0;
             // TODO When minimum version of Java becomes Java 9, use Arrays.compare, which vectorizes.
-            boolean e1, e2;
+            {{ primitiveTypeName }} e1, e2;
             int r, i, j;
             for (i = from, j = otherAFrom; i < to && i < otherATo; i++, j++) {
                 e1 = a[i];
                 e2 = otherA[j];
-                if ((r = (Boolean.compare((e1), (e2)))) != 0) return r;
+                if ((r = ({{ wrapperClassName }}.compare((e1), (e2)))) != 0) return r;
             }
             return i < otherATo ? -1 : (i < to ? 1 : 0);
         }
 
         @Override
-        public int compareTo(final java.util.List<? extends Boolean> l) {
-            if (l instanceof BooleanArrayList other) {
-
+        public int compareTo(final java.util.List<? extends {{ wrapperClassName }}> l) {
+            if (l instanceof {{ capitalizedPrimitiveTypeName }}ArrayList other) {
                 return contentsCompareTo(other.a, 0, other.size());
             }
             if (l instanceof SubList other) {
-
                 return contentsCompareTo(other.getParentArray(), other.from, other.to);
             }
             return super.compareTo(l);
@@ -631,7 +625,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
     }
 
     @Override
-    public BooleanList subList(int from, int to) {
+    public {{ capitalizedPrimitiveTypeName }}List subList(int from, int to) {
         if (from == 0 && to == size()) return this;
         ensureIndex(from);
         ensureIndex(to);
@@ -649,8 +643,8 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      * @param length the number of elements to be copied.
      */
     @Override
-    public void getElements(final int from, final boolean[] a, final int offset, final int length) {
-        BooleanArrays.ensureOffsetLength(a, offset, length);
+    public void getElements(final int from, final {{ primitiveTypeName }}[] a, final int offset, final int length) {
+        {{ capitalizedPrimitiveTypeName }}Arrays.ensureOffsetLength(a, offset, length);
         System.arraycopy(this.a, from, a, offset, length);
     }
 
@@ -676,9 +670,9 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      * @param length the number of elements to add.
      */
     @Override
-    public void addElements(final int index, final boolean[] a, final int offset, final int length) {
+    public void addElements(final int index, final {{ primitiveTypeName }}[] a, final int offset, final int length) {
         ensureIndex(index);
-        BooleanArrays.ensureOffsetLength(a, offset, length);
+        {{ capitalizedPrimitiveTypeName }}Arrays.ensureOffsetLength(a, offset, length);
         grow(size + length);
         System.arraycopy(this.a, index, this.a, index + length, size - index);
         System.arraycopy(a, offset, this.a, index, length);
@@ -694,40 +688,40 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
      * @param length the number of elements to add.
      */
     @Override
-    public void setElements(final int index, final boolean[] a, final int offset, final int length) {
+    public void setElements(final int index, final {{ primitiveTypeName }}[] a, final int offset, final int length) {
         ensureIndex(index);
-        BooleanArrays.ensureOffsetLength(a, offset, length);
+        {{ capitalizedPrimitiveTypeName }}Arrays.ensureOffsetLength(a, offset, length);
         if (index + length > size)
             throw new IndexOutOfBoundsException("End index (" + (index + length) + ") is greater than list size (" + size + ")");
         System.arraycopy(a, offset, this.a, index, length);
     }
 
     @Override
-    public void forEach(final BooleanConsumer action) {
+    public void forEach(final {{ capitalizedPrimitiveTypeName }}Consumer action) {
         for (int i = 0; i < size; ++i) {
             action.accept(a[i]);
         }
     }
 
     @Override
-    public boolean addAll(int index, final BooleanCollection c) {
-        if (c instanceof BooleanList) {
-            return addAll(index, (BooleanList) c);
+    public boolean addAll(int index, final {{ capitalizedPrimitiveTypeName }}Collection c) {
+        if (c instanceof {{ capitalizedPrimitiveTypeName }}List) {
+            return addAll(index, ({{ capitalizedPrimitiveTypeName }}List) c);
         }
         ensureIndex(index);
         int n = c.size();
         if (n == 0) return false;
         grow(size + n);
         System.arraycopy(a, index, a, index + n, size - index);
-        final BooleanIterator i = c.iterator();
+        final {{ capitalizedPrimitiveTypeName }}Iterator i = c.iterator();
         size += n;
-        while (n-- != 0) a[index++] = i.nextBoolean();
+        while (n-- != 0) a[index++] = i.next{{ capitalizedPrimitiveTypeName }}();
         assert size <= a.length;
         return true;
     }
 
     @Override
-    public boolean addAll(final int index, final BooleanList l) {
+    public boolean addAll(final int index, final {{ capitalizedPrimitiveTypeName }}List l) {
         ensureIndex(index);
         final int n = l.size();
         if (n == 0) return false;
@@ -740,8 +734,8 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
     }
 
     @Override
-    public boolean removeAll(final BooleanCollection c) {
-        final boolean[] a = this.a;
+    public boolean removeAll(final {{ capitalizedPrimitiveTypeName }}Collection c) {
+        final {{ primitiveTypeName }}[] a = this.a;
         int j = 0;
         for (int i = 0; i < size; i++)
             if (!c.contains(a[i])) a[j++] = a[i];
@@ -751,16 +745,16 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
     }
 
     @Override
-    public boolean[] toArray(boolean[] a) {
+    public {{ primitiveTypeName }}[] toArray({{ primitiveTypeName }}[] a) {
         if (a == null || a.length < size) a = java.util.Arrays.copyOf(a, size);
         System.arraycopy(this.a, 0, a, 0, size);
         return a;
     }
 
     @Override
-    public BooleanListIterator listIterator(final int index) {
+    public {{ capitalizedPrimitiveTypeName }}ListIterator listIterator(final int index) {
         ensureIndex(index);
-        return new BooleanListIterator() {
+        return new {{ capitalizedPrimitiveTypeName }}ListIterator() {
             int pos = index, last = -1;
 
             @Override
@@ -774,13 +768,13 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
             }
 
             @Override
-            public boolean nextBoolean() {
+            public boolean next{{ capitalizedPrimitiveTypeName }}() {
                 if (!hasNext()) throw new NoSuchElementException();
                 return a[last = pos++];
             }
 
             @Override
-            public boolean previousBoolean() {
+            public boolean previous{{ capitalizedPrimitiveTypeName }}() {
                 if (!hasPrevious()) throw new NoSuchElementException();
                 return a[last = --pos];
             }
@@ -797,7 +791,7 @@ public class {{ className }} extends AbstractConcurrent{{ capitalizedPrimitiveTy
 
             @Override
             public void add(boolean k) {
-                BooleanArrayList.this.add(pos++, k);
+                {{ className }}.this.add(pos++, k);
                 last = -1;
             }
 
